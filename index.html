@@ -718,7 +718,7 @@ function previewProposal() {
 }
 
 // ── CHECK HASH ON LOAD ──
-function h() {
+function checkHash() {
   const hash = window.location.hash;
   if (hash.startsWith('#proposal=')) {
     try {
@@ -930,6 +930,13 @@ document.head.appendChild(shakeStyle);
 
 // ── INIT ──
 checkHash();
+(function(){
+try {
+const defaultPublic = 'https://Masterlimit360.github.io/ephram/';
+const el = document.getElementById('publicBase');
+if (el && !el.value) el.value = defaultPublic;
+} catch(e){}
+})();
 </script>
 </body>
 </html>
