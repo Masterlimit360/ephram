@@ -653,13 +653,13 @@ function generateLink() {
   let publicBase = document.getElementById('publicBase')?.value.trim() || '';
   if (publicBase && !publicBase.endsWith('/')) publicBase += '/';
 
-  const base = publicBase || window.location.href.split('#')[0];
+  const base = publicBase || window.location.href.split(/[?#]/)[0];
   if (base.startsWith('file:') && !publicBase) {
     alert('Detected local file. Enter your public site URL (GitHub Pages) in the "Public Site URL" field so the shared link opens on the web.');
     return;
   }
 
-  const url = base.replace(/#.*$/, '') + '#proposal=' + b64url;
+  const url = base.replace(/[#?].*$/, '') + '?proposal=' + b64url;
 
   generatedData = { url, data };
   document.getElementById('linkUrl').textContent = url;
@@ -717,8 +717,22 @@ function previewProposal() {
   window.scrollTo(0, 0);
 }
 
-// ── CHECK HASH ON LOAD ──
+// ── CHECK PROPOSAL PARAM OR HASH ON LOAD ──
 function checkHash() {
+  const params = new URLSearchParams(window.location.search);
+  const proposalParam = params.get('proposal');
+  if (proposalParam) {
+    try {
+      const data = JSON.parse(fromBase64Url(proposalParam));
+      loadProposalData(data);
+      document.getElementById('creatorPage').classList.remove('active');
+      document.getElementById('proposalPage').classList.add('active');
+      return;
+    } catch(e) {
+      // Invalid data — fall back to hash
+    }
+  }
+
   const hash = window.location.hash;
   if (hash.startsWith('#proposal=')) {
     try {
